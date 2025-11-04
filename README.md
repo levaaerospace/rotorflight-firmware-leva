@@ -1,3 +1,11 @@
+# LevaAerospace Customization
+
+See [Rotorflight - Review](https://www.notion.so/Rotorflight-Review-2931fe406aeb804c8debc059635d3431) notes to understand the Control Architecture/Floww of the rototrflight firmware.
+
+TODO:
+- Add more comments in code files to make the purpose of the code files more clear.
+- Using Betaflight 4.6 (unreleased) changes described in the PR for [Position Hold](https://github.com/betaflight/betaflight/pull/13975/files) as reference, migrate Altitude Hold and Position Hold features into rotorflight.  
+
 # Rotorflight
 
 [Rotorflight](https://github.com/rotorflight) is a Flight Control software suite designed for
