@@ -29,8 +29,18 @@
 
 void levelingInit(const pidProfile_t *pidProfile);
 
+/**
+* @brief (ONLY for ANGLE Mode) multiplies the angle-error with "Proportional gain" to complete the Attitude-loop
+*/
 float angleModeApply(int axis, float pidSetpoint);
+
 float horizonModeApply(int axis, float pidSetpoint);
+
+//// Functions directly defined in the leveling.c file:
+/**
+* @brief calculate the attitude-error by mapping RC stick deflection to attitude (roll-pitch) setpoint.  
+* calcLevelErrorAngle()
+*/
 
 ADJFUN_DECLARE(ANGLE_LEVEL_GAIN)
 ADJFUN_DECLARE(HORIZON_LEVEL_GAIN)

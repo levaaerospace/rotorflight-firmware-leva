@@ -141,8 +141,23 @@ typedef struct pid_s {
 
 } pidData_t;
 
-
+/**
+* @brief calls the rate-loop (PID's) for different modes
+*
+*/
 void pidController(const pidProfile_t *pidProfile, timeUs_t currentTimeUs);
+
+//// Functions defined directly in the pid.c file: 
+/**
+* 
+* @brief contains the Angle Rate-loop PID 
+* pidApplyCyclicMode3()
+* pidApplyCyclicMode4()
+*
+* @brief applies rate-setpoints depending on ACRO or LEVEL modes 
+* pidApplySetpoint()
+*/
+
 
 void resetPidProfile(pidProfile_t *profile);
 
