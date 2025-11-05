@@ -15,6 +15,13 @@
  * along with this software. If not, see <https://www.gnu.org/licenses/>.
  */
 
+
+ /**
+* File containing the Angular Rate Control loop 
+*
+*/
+
+
 #pragma once
 
 #include <stdbool.h>
@@ -142,7 +149,7 @@ typedef struct pid_s {
 } pidData_t;
 
 /**
-* @brief calls the rate-loop (PID's) for different modes
+* @brief calls the rate control loop (PID) for different modes
 *
 */
 void pidController(const pidProfile_t *pidProfile, timeUs_t currentTimeUs);
@@ -150,12 +157,15 @@ void pidController(const pidProfile_t *pidProfile, timeUs_t currentTimeUs);
 //// Functions defined directly in the pid.c file: 
 /**
 * 
-* @brief contains the Angle Rate-loop PID 
+* @brief contains the rate-loop PID 
 * pidApplyCyclicMode3()
 * pidApplyCyclicMode4()
 *
 * @brief applies rate-setpoints depending on ACRO or LEVEL modes 
 * pidApplySetpoint()
+*
+* @brief grabs the gyro rate and processes it (can be called the rate estimate)
+* pidApplyGyroRate()
 */
 
 

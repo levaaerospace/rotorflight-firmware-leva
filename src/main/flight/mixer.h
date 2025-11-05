@@ -15,7 +15,13 @@
  * along with this software. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+
+ /**
+ *  This file mixes/maps the outputs of the rate-loop to helicopter actuators. Governor is called here, too.
+ */
+
+
+ #pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -62,7 +68,28 @@ void mixerInitConfig(void);
 
 void validateAndFixMixerConfig(void);
 
+/**
+*  @brief acts as a main mixing function.
+*/
 void mixerUpdate(timeUs_t currentTimeUs);
+
+//// Functions defined directly in mixer.c
+/**
+*  @brief evaluate hard-coded mixer and update motor and servo signals to be used by sbus_output.c
+*  mixerUpdateSwash()
+*  
+*  @brief calls the funcitons responsible for processing of collective, cyclic, tail rotor and governor.
+*  mixerUpdateInputs()
+*  
+*  @brief processes the collective.
+*  mixerUpdateCollective()
+*  
+*  @brief processes the cyclic.
+*  mixerUpdateCyclic()
+*  
+*  @brief processes the tail rotor actuation depending on type of tail-rotor.
+*  mixerUpdateMotorizedTail()
+*/
 
 float mixerGetInput(uint8_t index);
 float mixerGetInputHistory(uint8_t index, uint16_t delay);

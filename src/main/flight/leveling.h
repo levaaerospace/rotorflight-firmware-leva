@@ -18,6 +18,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+/**
+* This file handles the ANGLE and HORIZON modes 
+*/
+
+
 #pragma once
 
 #include <stdbool.h>
@@ -36,7 +42,7 @@ float angleModeApply(int axis, float pidSetpoint);
 
 float horizonModeApply(int axis, float pidSetpoint);
 
-//// Functions directly defined in the leveling.c file:
+//// Functions defined directly in leveling.c
 /**
 * @brief calculate the attitude-error by mapping RC stick deflection to attitude (roll-pitch) setpoint.  
 * calcLevelErrorAngle()

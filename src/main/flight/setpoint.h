@@ -32,6 +32,10 @@ void setpointInitProfile(void);
 
 void setpointUpdateTiming(float frameTimeUs);
 
+
+/**
+* @brief prepares the setpoint for rate control using RC inpput
+*/
 void setpointUpdate(void);
 
 bool isHandsOn(void);
