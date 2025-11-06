@@ -1599,6 +1599,235 @@ static void pidApplyCyclicMode4(uint8_t axis)
                             pid.data[axis].F + pid.data[axis].B + pid.data[axis].O;
 }
 
+//// (sharvit): Experimental function:
+
+static void pidApplyCyclicMode5(uint8_t axis)
+{
+    // Rate setpoint
+    // grab output from the velocity loop
+
+    // Get gyro rate
+    const float gyroRate = pidApplyGyroRate(axis);
+
+    // Calculate error rate
+    const float errorRate = setpoint - gyroRate;
+
+    // Gains must be equal for both axis
+    const float Ki = fminf(pid.coef[PID_ROLL].Ki, pid.coef[PID_PITCH].Ki);
+    const float Ko = fminf(pid.coef[PID_ROLL].Ko, pid.coef[PID_PITCH].Ko);
+    const float Kf = fminf(pid.coef[PID_ROLL].Kf, pid.coef[PID_PITCH].Kf);
+
+
+  //// P-term
+
+    // Calculate P-component
+    pid.data[axis].P = pid.coef[axis].Kp * errorRate;
+
+
+  //// D-term (gyro only)
+
+    // Calculate D-term with bandwidth limit
+    const float dTerm = difFilterApply(&pid.dtermFilter[axis], -gyroRate);
+
+    // Calculate D-component
+    pid.data[axis].D = pid.coef[axis].Kd * dTerm;
+
+
+  //// I-term
+
+    // Apply error relax
+    const float itermErrorRate = applyItermRelax(axis, errorRate, gyroRate, setpoint);
+
+    // Saturation
+    const bool saturation = (pidAxisSaturated(axis) && pid.data[axis].axisError * itermErrorRate > 0);
+
+    // I-term change
+    const float itermDelta = saturation ? 0 : itermErrorRate * pid.dT * Ki;
+
+    // Calculate I-component (axisError and I are the same in Mode 4)
+    pid.data[axis].axisError = limitf(pid.data[axis].axisError + itermDelta, pid.errorLimit[axis] * Ki);
+    pid.data[axis].I = pid.data[axis].axisError;
+
+    // Get actual collective from the mixer
+    const float collective = getCollectiveDeflection();
+
+    // Convert 0..15° => 0..1
+    const float curve = fabsf(collective) * 0.8f;
+
+    // Apply error decay
+    float errorDecayRate, errorDecayLimit;
+
+    if (isAirborne() || pid.errorDecayRateGround == 0) {
+      errorDecayRate  = pidTableLookup(curve, error_decay_rate_curve, PID_LOOKUP_CURVE_POINTS) *
+        pid.errorDecayRateCyclic * 0.08f;
+      errorDecayLimit = pidTableLookup(curve, error_decay_limit_curve, PID_LOOKUP_CURVE_POINTS) *
+        pid.errorDecayLimitCyclic * 0.08f;
+    }
+    else {
+      errorDecayRate  = pid.errorDecayRateGround;
+      errorDecayLimit = 3600;
+    }
+
+    const float errorDecay = limitf(pid.data[axis].axisError * errorDecayRate, errorDecayLimit * Ki);
+
+    pid.data[axis].axisError -= errorDecay * pid.dT;
+
+    DEBUG_AXIS(ERROR_DECAY, axis, 0, errorDecayRate * 100);
+    DEBUG_AXIS(ERROR_DECAY, axis, 1, errorDecayLimit);
+    DEBUG_AXIS(ERROR_DECAY, axis, 2, errorDecay * 100);
+    DEBUG_AXIS(ERROR_DECAY, axis, 3, pid.data[axis].axisError * 1000);
+
+
+  //// Offset term
+
+    // Offset saturation
+    const bool offSaturation = (pidAxisSaturated(axis) && pid.data[axis].axisOffset * itermErrorRate * collective > 0);
+
+    // Offset change modulated by collective
+    const float offMod = copysignf(pidTableLookup(curve, offset_charge_curve, PID_LOOKUP_CURVE_POINTS), collective) / 100.0f;
+    const float offDelta = offSaturation ? 0 : itermErrorRate * pid.dT * offMod * Ko;
+
+    // Calculate Offset component
+    pid.data[axis].axisOffset = limitf(pid.data[axis].axisOffset + offDelta, pid.offsetLimit[axis] * Ko);
+    pid.data[axis].O = pid.data[axis].axisOffset * collective;
+
+    DEBUG_AXIS(HS_OFFSET, axis, 0, errorRate * 10);
+    DEBUG_AXIS(HS_OFFSET, axis, 1, itermErrorRate * 10);
+    DEBUG_AXIS(HS_OFFSET, axis, 2, offMod * 1000);
+    DEBUG_AXIS(HS_OFFSET, axis, 3, offDelta * 1000000);
+    DEBUG_AXIS(HS_OFFSET, axis, 4, pid.data[axis].axisError * 10);
+    DEBUG_AXIS(HS_OFFSET, axis, 5, pid.data[axis].axisOffset * 10);
+    DEBUG_AXIS(HS_OFFSET, axis, 6, pid.data[axis].O * 1000);
+    DEBUG_AXIS(HS_OFFSET, axis, 7, pid.data[axis].I * 1000);
+
+    // Apply offset decay
+    float offsetDecayRate, offsetDecayLimit;
+
+    if (isAirborne() || pid.errorDecayRateGround == 0) {
+      offsetDecayRate  = pidTableLookup(curve, offset_decay_rate_curve, PID_LOOKUP_CURVE_POINTS) * 0.04f;
+      offsetDecayLimit = pidTableLookup(curve, offset_decay_limit_curve, PID_LOOKUP_CURVE_POINTS);
+    }
+    else {
+      offsetDecayRate  = pid.errorDecayRateGround;
+      offsetDecayLimit = 3600;
+    }
+
+    const float offsetDecay = limitf(pid.data[axis].axisOffset * offsetDecayRate, offsetDecayLimit * Ko);
+
+    pid.data[axis].axisOffset -= offsetDecay * pid.dT;
+
+    DEBUG_AXIS(ERROR_DECAY, axis, 4, offsetDecayRate * 100);
+    DEBUG_AXIS(ERROR_DECAY, axis, 5, offsetDecayLimit);
+    DEBUG_AXIS(ERROR_DECAY, axis, 6, offsetDecay * 100);
+    DEBUG_AXIS(ERROR_DECAY, axis, 7, pid.data[axis].axisOffset * 10);
+
+
+  //// Feedforward
+
+    // Calculate F component
+    pid.data[axis].F = Kf * setpoint;
+
+
+  //// Feedforward Boost (FF Derivative)
+
+    // Calculate B-term with bandwidth limit
+    const float bTerm = difFilterApply(&pid.btermFilter[axis], setpoint);
+
+    // Calculate B-component
+    pid.data[axis].B = pid.coef[axis].Kb * bTerm;
+
+
+  //// PID Sum
+
+    // Calculate sum of all terms
+    pid.data[axis].pidSum = pid.data[axis].P + pid.data[axis].I + pid.data[axis].D +
+                            pid.data[axis].F + pid.data[axis].B + pid.data[axis].O;
+}
+
+
+void positionCotrol()
+{
+
+    //// POS control:
+
+    //grab rc-deflection and convert it into a position setpoint.
+
+    //grab the current position from gps(Sol.ll) or something.
+
+    //Calculate the position error.
+
+    //Multiply position error by P gain and apply limits.
+    
+
+    //// VEL control:
+
+    //Use the clipped output of the position loop as the velocity setpoint.
+    
+    //derive velocity from gps
+
+    //calculate velocity error
+
+    //calculate velocity error integral and perform filtering + Anti-windup
+
+    //calculate velocity error derivative and do post processing
+
+    //Get those P, I & D terms ready and add them.
+
+    //Clip the output of the vel-loop.
+
+
+    //// Onwards to ANttitude Control:
+    
+    //DANGEROUS:
+    //use the same cubic function used in Angle mode to map this output to the Angle setpoint
+    //calculateAngleSP();
+
+
+
+}
+
+
+/**
+*  @brief inspired by calcLevelErrorAngle() from leveling.c
+*/
+static float calculateAngleSP(int axis)
+{
+    const rollAndPitchTrims_t *angleTrim = &accelerometerConfig()->accelerometerTrims;
+    
+    // (sharv): the sauce lies here:
+    // float angle = level.AngleLimit * getOutputOfVelLoop(axis);
+    
+//Check if you need this for the very raw position hold first code 
+#ifdef USE_GPS_RESCUE
+    angle += gpsRescueAngle[axis] / 100.0f; // ANGLE IS IN CENTIDEGREES
+#endif
+    angle = constrainf(angle, -level.AngleLimit, level.AngleLimit);
+
+    float currentAngle = ((attitude.raw[axis] - angleTrim->raw[axis]) / 10.0f);
+
+    if (isUpsidedown() && FLIGHT_MODE(HORIZON_MODE)) {
+        switch (axis) {
+            case FD_PITCH:
+                currentAngle = -currentAngle;
+                break;
+            case FD_ROLL:
+                currentAngle -= SIGN(currentAngle) * 180;
+                break;
+        }
+    }
+
+    float error = angle - currentAngle;
+
+    return error;
+}
+
+
+
+
+
+
+
+
 
 static void pidApplyYawMode4(void)
 {

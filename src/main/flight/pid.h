@@ -168,6 +168,21 @@ void pidController(const pidProfile_t *pidProfile, timeUs_t currentTimeUs);
 * pidApplyGyroRate()
 */
 
+//// (sharvit): Experimental functions:
+void positionControl();
+void velocityControl();
+void copyOfpidController(onst pidProfile_t *pidProfile, timeUs_t currentTimeUs);
+/**
+*  pidApplyCyclicMode5()
+*  pidApplyOffsetBleedMode5()
+*  pidApplyOffsetFloodMode5()
+*  pidApplyCyclicCrossCoupling()
+*  pidApplyYawMode4()
+*/
+
+
+////
+
 
 void resetPidProfile(pidProfile_t *profile);
 
