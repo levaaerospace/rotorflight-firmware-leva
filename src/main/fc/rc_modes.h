@@ -41,6 +41,7 @@ typedef enum {
     BOXRESCUE,
     BOXGPSRESCUE,
     BOXFAILSAFE,
+    BOXPOSHOLD, //LEVA(sd): position hold mode
 
     BOXID_FLIGHTMODE_LAST = BOXFAILSAFE,
 

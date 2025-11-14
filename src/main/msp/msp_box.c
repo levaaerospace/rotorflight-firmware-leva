@@ -199,6 +199,10 @@ void initActiveBoxIds(void)
 #endif
     }
 
+#ifdef USE_POSHOLD
+        BME(BOXPOSHOLD);
+#endif
+
 #ifdef USE_GPS
     if (featureIsEnabled(FEATURE_GPS)) {
 #ifdef USE_GPS_RESCUE

@@ -43,6 +43,7 @@ const char *armingDisableFlagNames[]= {
     "CRASH",
     "THROTTLE",
     "ANGLE",
+    "POSHOLD", //LEVA(sd): position hold mode 
     "BOOTGRACE",
     "NOPREARM",
     "LOAD",

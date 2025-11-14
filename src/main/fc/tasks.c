@@ -57,6 +57,8 @@
 #include "flight/imu.h"
 #include "flight/mixer.h"
 #include "flight/pid.h"
+//LEVA(sd): position hold mode
+#include "flight/pos_hold.h"
 
 #include "io/asyncfatfs/asyncfatfs.h"
 #include "io/beeper.h"
@@ -347,6 +349,14 @@ task_attribute_t task_attributes[TASK_COUNT] = {
 
 #ifdef USE_GPS
     [TASK_GPS] = DEFINE_TASK("GPS", NULL, NULL, gpsUpdate, TASK_PERIOD_HZ(TASK_GPS_RATE), TASK_PRIORITY_MEDIUM), // Required to prevent buffer overruns if running at 115200 baud (115 bytes / period < 256 bytes buffer)
+#endif
+
+/** 
+* TODO: create a new file in flight directory for pos-hold and call a update function here:  
+*/
+#ifdef USE_POSHOLD
+    [TASK_POSHOLD] = DEFINE_TASK("POSHOLD", NULL, NULL, updatePosHold, TASK_PERIOD_HZ(POSHOLD_TASK_RATE_HZ), TASK_PRIORITY_LOW),
+
 #endif
 
 #ifdef USE_MAG

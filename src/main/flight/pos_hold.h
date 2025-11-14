@@ -18,24 +18,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+
 #pragma once
 
-#include <stdbool.h>
+// #include "pg/pos_hold.h"
 
-#include "common/axis.h"
+#ifdef USE_POSHOLD
 
+#include "common/time.h"
+#include "io/gps.h"
 
-void levelingInit(const pidProfile_t *pidProfile);
+#define POSHOLD_TASK_RATE_HZ 100 // hz
 
-/**
-* @brief (ONLY for ANGLE Mode) multiplies the angle-error with "Proportional gain" to complete the Attitude-loop
-*/
-float angleModeApply(int axis, float pidSetpoint);
+void posHoldInit(void);
+void updatePosHold(timeUs_t currentTimeUs);
 
-float horizonModeApply(int axis, float pidSetpoint);
+bool posHoldFailure(void);
 
-//// Functions defined directly in leveling.c
-/**
-* @brief calculate the attitude-error by mapping RC stick deflection to attitude (roll-pitch) setpoint.  
-* calcLevelErrorAngle()
-*/
+#endif // USE_POSHOLD
