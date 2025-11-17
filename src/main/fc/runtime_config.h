@@ -65,7 +65,7 @@ typedef enum {
     ARMING_DISABLED_REBOOT_REQUIRED = (1 << 22),
     ARMING_DISABLED_DSHOT_BITBANG   = (1 << 23),
     ARMING_DISABLED_ACC_CALIBRATION = (1 << 24),
-    ARMING_DISABLED_MOTOR_PROTOCOL  = (1 << 25),
+    ARMING_DISABLED_MOTOR_PROTOCOL  = (1 << 25),  
     ARMING_DISABLED_ARM_SWITCH      = (1 << 26), // Needs to be the last element, since it's always activated if one of the others is active when arming
 } armingDisableFlags_e;
 
@@ -116,9 +116,9 @@ extern uint16_t flightModeFlags;
    [BOXALTHOLD]     = ALTHOLD_MODE_BIT,                  \
    [BOXRESCUE]      = RESCUE_MODE_BIT,                   \
    [BOXGPSRESCUE]   = GPS_RESCUE_MODE_BIT,               \
+   [BOXPOSHOLD]     = POSHOLD_MODE,                      \
    [BOXFAILSAFE]    = FAILSAFE_MODE_BIT,                 \
-   [BOXPOSHOLD]     = POSHOLD_MODE_BIT,                  \
-}                                                        \
+   }                                                     \
 /**/
 
 typedef enum {

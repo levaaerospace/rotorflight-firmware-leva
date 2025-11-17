@@ -102,6 +102,9 @@
 #include "flight/servos.h"
 #include "flight/governor.h"
 #include "flight/rpm_filter.h"
+//LEVA(sd): position hold mode 
+#include "flight/pos_hold.h"
+
 
 #include "io/asyncfatfs/asyncfatfs.h"
 #include "io/beeper.h"

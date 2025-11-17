@@ -77,6 +77,8 @@
 #include "flight/servos.h"
 #include "flight/governor.h"
 #include "flight/rescue.h"
+//LEVA(sd): position hold mode 
+#include "flight/pos_hold.h"
 
 #include "io/beeper.h"
 #include "io/gps.h"
@@ -662,14 +664,14 @@ void processRxModes(timeUs_t currentTimeUs)
         }
 
         //LEVA(sd): need to validate if correct >>
-        if (IS_RC_MODE_ACTIVE(BOXPOSHOLD)) {
-            ENABLE_FLIGHT_MODE(POSHOLD_MODE);
-            DISABLE_FLIGHT_MODE(ANGLE_MODE);
-            DISABLE_FLIGHT_MODE(HORIZON_MODE);
-            DISABLE_FLIGHT_MODE(TRAINER_MODE);
-        } else {
-            DISABLE_FLIGHT_MODE(POSHOLD_MODE);
-        }
+        // if (IS_RC_MODE_ACTIVE(BOXPOSHOLD)) {
+        //     ENABLE_FLIGHT_MODE(POSHOLD_MODE);
+        //     DISABLE_FLIGHT_MODE(ANGLE_MODE);
+        //     DISABLE_FLIGHT_MODE(HORIZON_MODE);
+        //     DISABLE_FLIGHT_MODE(TRAINER_MODE);
+        // } else {
+        //     DISABLE_FLIGHT_MODE(POSHOLD_MODE);
+        // }
         // <<
 
         if (IS_RC_MODE_ACTIVE(BOXANGLE)) {
