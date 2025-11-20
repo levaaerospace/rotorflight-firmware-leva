@@ -254,14 +254,15 @@ void initActiveBoxIds(void)
         BME(BOXANGLE);
         BME(BOXHORIZON);
         BME(BOXRESCUE);
+        BME(BOXPOSHOLD); //Leva: just testing
 #ifdef USE_ACRO_TRAINER
         BME(BOXTRAINER);
 #endif
     }
 
-#ifdef USE_POSHOLD
-        BME(BOXPOSHOLD);
-#endif
+// #ifdef USE_POSHOLD
+//         BME(BOXPOSHOLD);
+// #endif
 
 #ifdef USE_GPS
     if (featureIsEnabled(FEATURE_GPS)) {
