@@ -30,7 +30,7 @@
 #include "fc/core.h"
 #include "fc/runtime_config.h"
 #include "fc/rc.h"
-#include "flight/autopilot.h"
+#include "flight/autopilot.h" ////
 #include "flight/failsafe.h"
 #include "flight/imu.h"
 #include "flight/position.h"
@@ -38,7 +38,10 @@
 #include "sensors/compass.h"
 
 #include "pg/pos_hold.h"
+//Leva:
 #include "pos_hold.h"
+#include "flight/pos_hold.h"
+#include "fc/tasks.c"
 
 typedef struct posHoldState_s {
     bool isEnabled;
@@ -60,7 +63,10 @@ static void posHoldCheckSticks(void)
 {
     // if failsafe is active, eg landing mode, don't update the original start point
     if (!failsafeIsActive() && posHold.useStickAdjustment) {
-        const bool sticksDeflected = (getRcDeflectionAbs(FD_ROLL) > posHold.deadband) || (getRcDeflectionAbs(FD_PITCH) > posHold.deadband);
+        // const bool sticksDeflected = (getRcDeflectionAbs(FD_ROLL) > posHold.deadband) || (getRcDeflectionAbs(FD_PITCH) > posHold.deadband);
+        // setSticksActiveStatus(sticksDeflected);
+        //getRcDeflection(FD_ROLL)
+        const bool sticksDeflected = (getRcDeflection(FD_ROLL) > posHold.deadband) || (getRcDeflection(FD_PITCH) > posHold.deadband);
         setSticksActiveStatus(sticksDeflected);
     }
 }
@@ -82,8 +88,8 @@ static bool sensorsOk(void)
 
 void updatePosHold(timeUs_t currentTimeUs) {
     UNUSED(currentTimeUs);
-    if (FLIGHT_MODE(POS_HOLD_MODE)) {
-        if (!posHold.isEnabled) {
+    if (FLIGHT_MODE(POSHOLD_MODE)) { 
+        if (!posHold.isEnabled) { 
             resetPositionControl(&gpsSol.llh, POSHOLD_TASK_RATE_HZ); // sets target location to current location
             posHold.isControlOk = true;
             posHold.isEnabled = true;
@@ -101,9 +107,10 @@ void updatePosHold(timeUs_t currentTimeUs) {
     }
 }
 
+
 bool posHoldFailure(void) {
     // used only to display warning in OSD if requested but failing
-    return FLIGHT_MODE(POS_HOLD_MODE) && (!posHold.isControlOk || !posHold.areSensorsOk);
+    return FLIGHT_MODE(POSHOLD_MODE) && (!posHold.isControlOk || !posHold.areSensorsOk);
 }
 
 #endif // USE_POSHOLD

@@ -104,6 +104,8 @@ COMMON_SRC = \
             flight/rescue.c \
             flight/setpoint.c \
             flight/wiggle.c \
+            flight/pos_hold.c \
+            flight/autopilot.c \
             io/serial_4way.c \
             io/serial_4way_avrootloader.c \
             io/serial_4way_stk500v2.c \

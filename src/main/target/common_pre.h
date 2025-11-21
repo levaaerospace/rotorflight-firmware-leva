@@ -77,6 +77,7 @@
 #define USE_LATE_TASK_STATISTICS
 #define USE_TELEMETRY_SBUS2
 #define USE_TELEMETRY_CASTLE
+//#define USE_POSHOLD //Leva: check if this needs to be copied to other places in this code too. 
 #endif // STM32F7
 
 #ifdef STM32H7
@@ -402,6 +403,12 @@ extern uint8_t _dmaram_end__;
 #define USE_EMFAT_ICON
 #define USE_GPS_PLUS_CODES
 #endif
+
+//Leva: copied from Betaflight Position Hold PR.
+#define USE_POSHOLD
+// #if defined(USE_POSHOLD) && !defined(USE_GPS)
+// #error "USE_POSHOLD requires USE_GPS to be defined"
+// #endif
 
 #if defined(STM32G4)
 #define MAX_PID_PROCESS_SPEED       1600

@@ -356,7 +356,6 @@ task_attribute_t task_attributes[TASK_COUNT] = {
 */
 #ifdef USE_POSHOLD
     [TASK_POSHOLD] = DEFINE_TASK("POSHOLD", NULL, NULL, updatePosHold, TASK_PERIOD_HZ(POSHOLD_TASK_RATE_HZ), TASK_PRIORITY_LOW),
-
 #endif
 
 #ifdef USE_MAG
@@ -504,6 +503,11 @@ void tasksInit(void)
 
 #ifdef USE_GPS
     setTaskEnabled(TASK_GPS, featureIsEnabled(FEATURE_GPS));
+#endif
+
+//Leva: Position Hold Mode, copied from Betaflight PR
+#ifdef USE_POSHOLD
+    setTaskEnabled(TASK_POSHOLD, featureIsEnabled(FEATURE_GPS));
 #endif
 
 #ifdef USE_MAG

@@ -114,6 +114,10 @@ typedef enum {
 #ifdef USE_GPS
     TASK_GPS,
 #endif
+//Leva: Position Hold Mode
+#ifdef USE_POSHOLD
+    TASK_POSHOLD,
+#endif
 #ifdef USE_MAG
     TASK_COMPASS,
 #endif

@@ -22,10 +22,10 @@
 
 #pragma once
 
-// #include "pg/pos_hold.h"
+#include "pg/pos_hold.h"
 
 #ifdef USE_POSHOLD
-
+#include <stdint.h>
 #include "common/time.h"
 #include "io/gps.h"
 
@@ -33,6 +33,8 @@
 
 void posHoldInit(void);
 void updatePosHold(timeUs_t currentTimeUs);
+
+// void resetPositionControl(const gpsLocation_t *initialTargetLocation, unsigned taskRateHz);
 
 bool posHoldFailure(void);
 

@@ -979,6 +979,11 @@ void init(void)
     motorEnable();
 #endif
 
+//Leva:
+#ifdef USE_POSHOLD
+    posHoldInit();
+#endif
+
     // On H7/G4 allocate SPI DMA streams after motor timers as SPI DMA allocate will always be possible
 #if defined(STM32H7) || defined(STM32G4)
 #ifdef USE_SPI
